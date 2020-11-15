@@ -4,7 +4,7 @@ int get_next_line(int fd, char **line);
 ```
 Reads one line from input (without '\n') per call.
 
-On EOF zero is returned and line is empty.
+On EOF zero value is returned and line is empty.
 
 On error negative value is returned and line is null.
 
@@ -22,7 +22,7 @@ int main() {
         /* do stuff with line. */
         free(line);
     }
-    /* if line is null, then error occuried. */
+    /* if line is null, then error occurred. */
     if (line) {
         /* do stuff with last line, that does not ends with '\n'. */
         free(line);
