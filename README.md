@@ -8,11 +8,11 @@ On EOF zero value is returned and line is empty.
 
 On error negative value is returned and line is null.
 
-Multiple file descriptors is supported (get_next_line_bonus.h).
+Multiple file descriptors is supported.
 
 Usage:
 ```c
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 int main() {
     int   fd = STDIN_FILENO;
