@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jsandsla <jsandsla@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/01 17:32:41 by jsandsla          #+#    #+#             */
-/*   Updated: 2020/11/02 14:20:56 by jsandsla         ###   ########.fr       */
+/*   Updated: 2020/11/02 14:21:31 by jsandsla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static int	line_expand(t_gnl_line *line, size_t required)
 {
@@ -78,7 +78,7 @@ static int	is_buffer_newline(t_gnl_buffer *buffer)
 	return (result);
 }
 
-static int	line_read(t_gnl_line *line, t_gnl_buffer *buffer, int fd)
+static int	line_read(t_gnl_line *line, t_gnl_buffer *buffer)
 {
 	ssize_t	result;
 
@@ -86,7 +86,7 @@ static int	line_read(t_gnl_line *line, t_gnl_buffer *buffer, int fd)
 	result = line_append(line, buffer) ? 1 : -1;
 	while (result > 0 && !is_buffer_newline(buffer))
 	{
-		result = read(fd, buffer->ptr, BUFFER_SIZE);
+		result = read(buffer->fd, buffer->ptr, BUFFER_SIZE);
 		if (result > 0)
 		{
 			buffer->start = 0;
@@ -105,17 +105,25 @@ static int	line_read(t_gnl_line *line, t_gnl_buffer *buffer, int fd)
 
 int			get_next_line(int fd, char **ppline)
 {
-	static t_gnl_buffer	buffer;
+	static t_gnl_table	table;
+	t_gnl_buffer		*buffer;
 	t_gnl_line			line;
 	int					result;
 
+	result = -1;
 	line.max_len = 0;
 	line.ptr = 0;
-	result = line_read(&line, &buffer, fd);
-	*ppline = 0;
-	if (result >= 0)
-		*ppline = line.ptr;
-	else if (line.ptr)
-		free(line.ptr);
+	buffer = get_gnl_buffer(&table, fd);
+	if (buffer)
+	{
+		result = line_read(&line, buffer);
+		if (result <= 0)
+			delete_gnl_buffer(&table, buffer);
+		*ppline = 0;
+		if (result >= 0)
+			*ppline = line.ptr;
+		else if (line.ptr)
+			free(line.ptr);
+	}
 	return (result);
 }
